@@ -5,11 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File",
+            "name": "Run Debug",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
+            "program": "./app.py",
+            "console": "integratedTerminal",
+            // https://stackoverflow.com/questions/71834240/how-to-debug-pyqt5-threads-in-visual-studio-code
+            "qt": "pyqt5"
         }
     ]
 }
