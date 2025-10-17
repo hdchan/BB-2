@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <!-- Bootstrap CSS from CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous">
+        </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        img {
+            width: auto;
+            height: 30vh;
+            /* Ensures the image maintains its aspect ratio */
+        }
+    </style>
+    <script>
+        var socket = io();
+        // var username = prompt("Enter your name:");  // Ask for username
+        // socket.emit("join");  // Notify server of new user
+
+        function join() {
+            socket.emit("join");
+        }
+
+        socket.on('connect', function () {
+            console.log('connected')
+            join()
+        });
+
+        // Listen for messages from server
+        socket.on("search-result", function (data) {
+            container = document.getElementById("card-container")
+            container.innerHTML = ""
+            for (let i = 0; i < data.length; i++) {
+                // console.log(data[i])
+                const imgElement = document.createElement('img');
+                // Set the source (src) attribute
+                imgElement.src = data[i].FrontArt;
+                imgElement.loading = 'lazy'
+                imgElement.dataset.payload = JSON.stringify(data[i])
+                container.appendChild(imgElement)
+            }
+            console.log(data)
+        });
+
+        // Function to send messages
+        function sendMessage() {
+            var msgInput = document.getElementById("msg");
+            console.log("searching" + msgInput)
+            var message = msgInput.value;
+            socket.emit('search', message);
+            msgInput.value = "";
+        }
+        
+        $(document).on('click', '#card-container img', function () {
+            console.log(this);            // DOM element
+            console.log($(this).data().payload);    // your attached data property
+            socket.emit('add-card', $(this).data().payload);
+            // console.log($(this).attr('src'));
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div data-masonry='{"percentPosition": true }' id="card-container">
+        </div>
+        <nav class="navbar fixed-bottom navbar-expand-lg navbar-light bg-light">
+            <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" name="name"
+                id="msg">
+            <button class="btn btn-outline-success ms-3" onclick="sendMessage()">Search</button>
+        </nav>
+    </div>
+    <script>
+        
+    </script>
+    <!-- Bootstrap JS and dependencies from CDN -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" async></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>
