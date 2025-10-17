@@ -1,1 +1,7 @@
-*__pycache__
+/build
+/dist
+__pycache__
+.venv
+.empty
+*.yaml
+.coverage

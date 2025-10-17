@@ -2,11 +2,15 @@ from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
 from flask_bootstrap import Bootstrap
 import requests
+from engineio.async_drivers import threading
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
 bootstrap = Bootstrap(app)
 
-socketio = SocketIO(app, ping_interval=60, ping_timeout=120)
+# https://github.com/miguelgrinberg/python-socketio/issues/35#issuecomment-2106836351
+# Packaging flask with websockets using pyinstaller
+socketio = SocketIO(app, ping_interval=60, ping_timeout=120, ors_allowed_origins="*",async_mode="threading")
 
 # Dictionary to store users and their assigned rooms
 satellites = {}
@@ -68,6 +72,7 @@ def handle_message(data):
 @socketio.on('add-card')
 def handle_message(data):
     print(data)
+    emit("message", data, room=BASE_ROOM_KEY)
 
 # Handle user messages
 @socketio.on('message')
@@ -87,4 +92,4 @@ def handle_disconnect():
     # emit("message", f"{username} left the chat", broadcast=True)
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", debug=True)
+    socketio.run(app, host="0.0.0.0", debug=False)
