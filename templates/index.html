@@ -19,8 +19,8 @@
 
         // Listen for messages from server
         socket.on("message", function(data) {
-            var messages = document.getElementById("messages");
-            messages.innerHTML += `<p>${data}</p>`;
+            obj = JSON.parse(data);
+            console.log(obj)
         });
 
         // Function to send messages
