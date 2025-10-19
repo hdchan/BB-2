@@ -37,42 +37,31 @@ def handle_join():
     join_room(SATELLITES_ROOM_KEY)
     # join_room(request.sid)
     emit("join-satellite", request.sid, room=BASE_ROOM_KEY)
-    # emit("message", f"{username} joined the chat", broadcast=True)
 
-@socketio.on('join-base')
+@socketio.on('join-as-base')
 def handle_join():
     username = f'base-{request.sid}'
     satellites[request.sid] = f'base-{request.sid}' # Store username by session ID
     base_sid.append(request.sid)
     join_room(BASE_ROOM_KEY)
-    emit("message", f"{username} joined the chat", broadcast=True)
-
-@socketio.on('send-satellite')
-def handle_send_state(data):
-    # print(data)
-    emit("message", data.get('data'), broadcast=data.get('satellite'))
 
 # Handle user messages
 @socketio.on('search')
 def handle_message(data):
     api_url = f"https://api.swu-db.com/cards/search?q=name:{data}"  # Example API
-
     # Make a GET request to the external API
     response = requests.get(api_url)
-
     # Raise an exception for bad status codes (4xx or 5xx)
     response.raise_for_status()
-
     # Parse the JSON response
     data = response.json()['data']
-
     emit("search-result", data, room=request.sid)
 
 # Handle user messages
 @socketio.on('add-card')
 def handle_message(data):
     print(data)
-    emit("message", data, room=BASE_ROOM_KEY)
+    emit("add-card", data, room=BASE_ROOM_KEY)
 
 # Handle user messages
 @socketio.on('message')
